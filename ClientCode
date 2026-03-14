@@ -1,0 +1,45 @@
+# UDPPingerClient.py
+
+from socket import *
+import time
+
+# Server information
+serverName = '127.0.0.1'
+serverPort = 12000
+
+# Create UDP socket
+clientSocket = socket(AF_INET, SOCK_DGRAM)
+
+# Set timeout to 1 second
+clientSocket.settimeout(1)
+
+# Send 10 ping messages
+for i in range(1, 11):
+    try:
+        # Record time packet is sent
+        sendTime = time.time()
+
+        # Create ping message
+        message = f"Ping {i} {sendTime}"
+
+        # Send message to server
+        clientSocket.sendto(message.encode(), (serverName, serverPort))
+
+        # Receive response from server
+        modifiedMessage, serverAddress = clientSocket.recvfrom(1024)
+
+        # Record receive time
+        receiveTime = time.time()
+
+        # Calculate RTT
+        rtt = receiveTime - sendTime
+
+        # Print response and RTT
+        print(modifiedMessage.decode(), "RTT:", rtt)
+
+    except timeout:
+        # If no response within 1 second
+        print("Request timed out")
+
+# Close socket
+clientSocket.close()
